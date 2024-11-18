@@ -132,8 +132,12 @@ def rewrite(
     path: StrPath,
     encoding: Optional[str],
 ) -> Iterator[Tuple[IO[str], IO[str]]]:
-    pathlib.Path(path).touch()
+    path = pathlib.Path(path)
 
+    if path.is_symlink():
+        path = path.resolve()
+
+    path.touch()
     with tempfile.NamedTemporaryFile(mode="w", encoding=encoding, delete=False) as dest:
         error = None
         try:
